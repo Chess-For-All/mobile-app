@@ -3,6 +3,7 @@ import {App} from "octokit";
 import {createNodeMiddleware} from "@octokit/webhooks";
 import fs from "fs";
 import http from "http";
+import path from "path"
 
 dotenv.config();
 
@@ -22,45 +23,40 @@ const app = new App({
 
 const messageForNewPRs = "Thanks for opening a new PR! Please follow our contributing guidelines to make your PR easier to review.";
 
-async function handlePullRequestOpened({octokit, payload}) {
-  console.log(`Received a pull request event for #${payload.pull_request.number}`);
-
-  try {
-    await octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
-      owner: payload.repository.owner.login,
-      repo: payload.repository.name,
-      issue_number: payload.pull_request.number,
-      body: messageForNewPRs,
-      headers: {
-        "x-github-api-version": "2022-11-28",
-      },
-    });
-  } catch (error) {
-    if (error.response) {
-      console.error(`Error! Status: ${error.response.status}. Message: ${error.response.data.message}`)
+async function handleRequest(req, res) {
+  const parsedUrl = url.parse(req.url, true);
+  const path = parsedUrl.pathname;
+  const formattedPath = path === '/' ? '/index.html' : path;
+  const filePathAdr = path.join(__dirname, formattedPath.slice(1));
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'text/plain');
+      res.end(`Error: ${err}\n`);
+      return;
     }
-    console.error(error)
-  }
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    res.end(data);
+  });
 };
 
-app.webhooks.on("pull_request.opened", handlePullRequestOpened);
+app.webhooks.on("request.handled", handleRequest);
 
 app.webhooks.onError((error) => {
-  if (error.name === "AggregateError") {
-    console.error(`Error processing request: ${error.event}`);
-  } else {
     console.error(error);
-  }
+    return
 });
 
-const port = 3000;
+const port = 443;
 const host = 'localhost';
-const path = "/api/webhook";
+const path = "/";
 const localWebhookUrl = `http://${host}:${port}${path}`;
 
 const middleware = createNodeMiddleware(app.webhooks, {path});
 
-http.createServer(middleware).listen(port, () => {
-  console.log(`Server is listening for events at: ${localWebhookUrl}`);
-  console.log('Press Ctrl + C to quit.')
-});
+const servship = http.createServer(middleware)
+  .listen(port, () => {
+      console.log(`Server running at ${localWebhookUrl}`);
+  });
