@@ -28,7 +28,7 @@ async function handleRequest(req, res) {
   const path = parsedUrl.pathname;
   const formattedPath = path === '/' ? '/index.html' : path;
   const filePathAdr = path.join(__dirname, formattedPath.slice(1));
-  fs.readFile(filePath, (err, data) => {
+  fs.readFile(filePathAdr, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'text/plain');
