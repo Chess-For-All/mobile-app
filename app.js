@@ -50,10 +50,10 @@ app.webhooks.onError((error) => {
 
 const port = 443;
 const host = 'localhost';
-const path = "/";
-const localWebhookUrl = `http://${host}:${port}${path}`;
+const npath = "/";
+const localWebhookUrl = `http://${host}:${port}${npath}`;
 
-const middleware = createNodeMiddleware(app.webhooks, {path});
+const middleware = createNodeMiddleware(app.webhooks, {npath});
 
 const servship = http.createServer(middleware)
   .listen(port, () => {
