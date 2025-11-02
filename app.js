@@ -24,8 +24,8 @@ const messageForNewPRs = "Thanks for opening a new PR! Please follow our contrib
 
 async function handleRequest(req, res) {
   const parsedUrl = url.parse(req.url, true);
-  const path = parsedUrl.pathname;
-  const formattedPath = path === '/' ? '/index.html' : path;
+  const $path = parsedUrl.pathname;
+  const formattedPath = $path === '/' ? '/index.html' : $path;
   const filePathAdr = path.join(__dirname, formattedPath.slice(1));
   fs.readFile(filePathAdr, (err, data) => {
     if (err) {
