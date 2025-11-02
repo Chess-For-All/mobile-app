@@ -1,14 +1,14 @@
 {
-  "name": "github-app-webhook-tutorial",
+  "name": "chess-for-all-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Chess must be fair and available for everyone.",
   "main": "app.js",
   "type": "module",
   "scripts": {
     "server": "node app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "mihail0011",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.0.3",
